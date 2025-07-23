@@ -3454,7 +3454,7 @@ max-width:6vw; max-height:6vw; margin:4px">
 </script>
 <script>
 (function(){
-  // 1) Cria o input de um dígito
+  // Cria o input
   const digitInput = document.createElement('input');
   digitInput.type = 'text';
   digitInput.maxLength = 1;
@@ -3462,31 +3462,42 @@ max-width:6vw; max-height:6vw; margin:4px">
     position: 'fixed',
     top: '4px',
     left: '200px',
-    width: '20px',
-    padding: '2px',
-    fontSize: '12px',
+    width: '24px',
+    padding: '4px',
+    fontSize: '14px',
     textAlign: 'center',
     zIndex: '9999'
   });
   document.body.appendChild(digitInput);
 
-  // 2) Quando detectar um caractere...
+  // Envia caractere só após foco no canvas
   digitInput.addEventListener('input', () => {
     const ch = digitInput.value;
     if (!ch) return;
-    // empurra pro key buffer
-    if (window.codo_key_buffer && typeof codo_key_buffer.push === 'function') {
-      codo_key_buffer.push(ch.charCodeAt(0));
-    }
-    // limpa e retorna o foco ao PICO-8
+
     digitInput.value = '';
-    if (typeof p8_give_focus === 'function') {
-      p8_give_focus();
-    }
+    digitInput.blur(); // fecha teclado virtual
+
+    // espera foco estabilizar no PICO-8
+    setTimeout(() => {
+      const canvas = document.querySelector('canvas');
+      if (canvas) {
+        canvas.focus(); // força foco no canvas
+      }
+      if (typeof p8_give_focus === 'function') {
+        p8_give_focus();
+      }
+
+      // espera ~50ms pra garantir que o foco aplicou
+      setTimeout(() => {
+        if (window.codo_key_buffer && typeof codo_key_buffer.push === 'function') {
+          codo_key_buffer.push(ch.charCodeAt(0));
+        }
+      }, 50);
+    }, 50);
   });
 
-  // 3) coloca foco inicial no input
-  digitInput.focus();
+  digitInput.focus(); // foco inicial no input
 })();
 </script>
 
