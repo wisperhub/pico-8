@@ -3411,32 +3411,41 @@ max-width:6vw; max-height:6vw; margin:4px">
 	}, 1000);
 	
 </script>
-<!-- Botão para chamar o teclado -->
-<div style="position:fixed; bottom:80px; right:20px; z-index:9999;">
-  <button id="openKeyboard" style="padding:10px; font-size:16px;">⌨️</button>
-  <input type="text" id="hiddenInput" style="position:absolute; opacity:0; height:1px;" />
+<!-- Botão para abrir teclado -->
+<div id="keyboardContainer" style="
+  position: fixed;
+  bottom: 80px;
+  left: 20px;
+  z-index: 9999;
+  pointer-events: auto;
+">
+  <button id="openKeyboard" style="
+    padding: 12px 14px;
+    font-size: 20px;
+    border-radius: 8px;
+    border: none;
+    background: #ff80a0;
+    color: black;
+  ">⌨️</button>
+  <input id="hiddenInput" type="text" style="opacity: 0; position: absolute; z-index: -1;" />
 </div>
 
 <script>
-// Aponta para o input invisível
-const hiddenInput = document.getElementById("hiddenInput");
-const openKeyboard = document.getElementById("openKeyboard");
+const btn = document.getElementById("openKeyboard");
+const input = document.getElementById("hiddenInput");
 
-// Foca no input quando o botão for pressionado
-openKeyboard.addEventListener("click", () => {
-  hiddenInput.focus();
+btn.addEventListener("click", () => {
+  input.focus();
 });
 
-// Transfere o texto para o buffer do PICO-8
-hiddenInput.addEventListener("input", (e) => {
+input.addEventListener("input", e => {
   const text = e.target.value;
-  for (const char of text) {
-    if (typeof codo_key_buffer !== 'undefined') {
-      codo_key_buffer.push(char.charCodeAt(0));
+  if (typeof codo_key_buffer !== 'undefined') {
+    for (const ch of text) {
+      codo_key_buffer.push(ch.charCodeAt(0));
     }
   }
-  // limpa o input após enviar
-  e.target.value = '';
+  e.target.value = ''; // limpa após enviar
 });
 </script>
 
