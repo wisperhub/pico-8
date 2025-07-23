@@ -3411,42 +3411,37 @@ max-width:6vw; max-height:6vw; margin:4px">
 	}, 1000);
 	
 </script>
-<!-- Botão para abrir teclado -->
-<button onclick="openKeyboard()" style="
-  position: absolute;
-  bottom: 100px;
-  right: 20px;
-  z-index: 999;
-  padding: 10px 14px;
-  font-size: 14px;
-  background-color: #ff80a0;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-">⌨️</button>
+<!-- Botão para chamar o teclado -->
+<div style="position:fixed; bottom:80px; right:20px; z-index:9999;">
+  <button id="openKeyboard" style="padding:10px; font-size:16px;">⌨️</button>
+  <input type="text" id="hiddenInput" style="position:absolute; opacity:0; height:1px;" />
+</div>
 
-<!-- Input escondido que recebe o foco -->
-<input id="mobile_keyboard" inputmode="text"
-  style="position:absolute; opacity:0; top:-100px; left:-100px;"
-  oninput="this.value='';"
-/>
+<script>
+// Aponta para o input invisível
+const hiddenInput = document.getElementById("hiddenInput");
+const openKeyboard = document.getElementById("openKeyboard");
 
+// Foca no input quando o botão for pressionado
+openKeyboard.addEventListener("click", () => {
+  hiddenInput.focus();
+});
+
+// Transfere o texto para o buffer do PICO-8
+hiddenInput.addEventListener("input", (e) => {
+  const text = e.target.value;
+  for (const char of text) {
+    if (typeof codo_key_buffer !== 'undefined') {
+      codo_key_buffer.push(char.charCodeAt(0));
+    }
+  }
+  // limpa o input após enviar
+  e.target.value = '';
+});
+</script>
 
 	</body>
 	
-	<script>
-function openKeyboard() {
-  const input = document.getElementById("mobile_keyboard");
-  input.value = ''; // limpa
-  input.focus();    // ativa o teclado
-
-  // opcional: desfocar depois de um tempo
-  setTimeout(() => {
-    input.blur();
-  }, 15000); // desfoca em 15 segundos
-}
-</script>
-
 <!-- Mirrored from www.pico-8-edu.com/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 23 Jul 2025 14:44:03 GMT -->
 </html>
 	
