@@ -3451,142 +3451,52 @@ max-width:6vw; max-height:6vw; margin:4px">
   // 4) Opcional: já exibe o que estava no buffer
   updateLog();
 })();
-</script>
 <script>
 (function(){
-  // Cria o input
-  const digitInput = document.createElement('input');
-  digitInput.type = 'text';
-  digitInput.maxLength = 1;
-  Object.assign(digitInput.style, {
+  const ta = document.getElementById('codo_textarea_0');
+  if (!ta) return;
+
+  // Força visível e posiciona na tela
+  Object.assign(ta.style, {
     position: 'fixed',
     top: '4px',
     left: '200px',
     width: '24px',
+    height: '24px',
     padding: '4px',
     fontSize: '14px',
     textAlign: 'center',
-    zIndex: '9999'
+    zIndex: '9999',
+    opacity: '1',
+    display: 'block',
+    background: '#fff',
+    color: '#000'
   });
-  document.body.appendChild(digitInput);
 
-  // Envia caractere só após foco no canvas
-  digitInput.addEventListener('input', () => {
-    const ch = digitInput.value;
+  ta.maxLength = 1;
+
+  // Impede que perca o foco
+  ta.addEventListener('blur', () => {
+    setTimeout(() => ta.focus(), 0);
+  });
+
+  // Envia caractere para o buffer do PICO-8 (igual ao seu código)
+  ta.addEventListener('input', () => {
+    const ch = ta.value;
     if (!ch) return;
 
-    digitInput.value = '';
-    digitInput.blur(); // fecha teclado virtual
+    ta.value = '';
 
-    // espera foco estabilizar no PICO-8
-    setTimeout(() => {
-      const canvas = document.querySelector('canvas');
-      if (canvas) {
-        canvas.focus(); // força foco no canvas
-      }
-      if (typeof p8_give_focus === 'function') {
-        p8_give_focus();
-      }
+    // Garante que o foco continue no textarea
+    ta.focus();
 
-      // espera ~50ms pra garantir que o foco aplicou
-      setTimeout(() => {
-        if (window.codo_key_buffer && typeof codo_key_buffer.push === 'function') {
-          codo_key_buffer.push(ch.charCodeAt(0));
-        }
-      }, 50);
-    }, 50);
-  });
-
-  digitInput.focus(); // foco inicial no input
-})();
-</script>
-<script>
-(function() {
-  // 1. Cria o elemento ponte (input de 1 caractere) - visível
-  const bridgeInput = document.createElement('input');
-  bridgeInput.type = 'text';
-  bridgeInput.id = 'pico8-keyboard-bridge';
-  bridgeInput.maxLength = 1;
-  
-  // Estilo para o ponte: pequeno e ao lado do textarea
-  Object.assign(bridgeInput.style, {
-    position: 'fixed',
-    top: '10px',
-    left: '10px',
-    width: '20px',
-    height: '20px',
-    opacity: '1',
-    zIndex: '9999',
-    fontSize: '14px',
-    textAlign: 'center',
-    border: '1px solid #ccc'
-  });
-  
-  document.body.appendChild(bridgeInput);
-
-  // 2. Torna o textarea do PICO-8 visível e o posiciona
-  const picoTextarea = document.getElementById('codo_textarea_0');
-  if (picoTextarea) {
-    Object.assign(picoTextarea.style, {
-      position: 'fixed',
-      top: '10px',
-      left: '40px', // ao lado do input ponte
-      width: '200px',
-      height: '20px',
-      opacity: '1',
-      zIndex: '9999',
-      fontSize: '14px',
-      border: '1px solid #ccc',
-      background: '#fff'
-    });
-  }
-
-  // 3. Monitora quando o PICO-8 ganha foco
-  let isPicoFocused = false;
-  
-  function checkPicoFocus() {
-    isPicoFocused = document.activeElement === picoTextarea;
-  }
-  
-  setInterval(checkPicoFocus, 100);
-
-  // 4. Gerencia o fluxo de transferência
-  bridgeInput.addEventListener('input', function() {
-    if (!bridgeInput.value) return;
-    
-    const char = bridgeInput.value;
-    bridgeInput.value = '';  // Limpa após captura
-    
-    // 4.1. Transfere foco para o textarea do PICO-8
-    if (picoTextarea) {
-      picoTextarea.focus();
-      picoTextarea.select();
-      
-      // 4.2. Aguarda estabilização do foco
-      const pushChar = () => {
-        if (isPicoFocused && window.codo_key_buffer) {
-          // 4.3. Envia caractere para o buffer do PICO-8
-          codo_key_buffer.push(char.charCodeAt(0));
-        } else {
-          // Reagenda se ainda não está pronto
-          setTimeout(pushChar, 50);
-        }
-      };
-      
-      setTimeout(pushChar, 50);
+    // Empurra o caractere para o buffer
+    if (window.codo_key_buffer && typeof codo_key_buffer.push === 'function') {
+      codo_key_buffer.push(ch.charCodeAt(0));
     }
   });
 
-  // 5. Sistema de ativação automática
-  function activateBridge() {
-    if (!isPicoFocused) {
-      bridgeInput.focus();
-      setTimeout(activateBridge, 500);
-    }
-  }
-  
-  // Inicia o monitoramento
-  activateBridge();
+  ta.focus();
 })();
 </script>
 
