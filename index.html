@@ -3411,6 +3411,84 @@ max-width:6vw; max-height:6vw; margin:4px">
 	}, 1000);
 	
 </script>
+<script>
+(function(){
+  // 1) Cria o container
+  const logDiv = document.createElement('div');
+  Object.assign(logDiv.style, {
+    position: 'fixed',
+    top: '0',
+    left: '0',
+    background: 'white',
+    color: 'black',
+    padding: '4px',
+    fontFamily: 'monospace',
+    fontSize: '12px',
+    zIndex: '9999',
+    maxHeight: '100vh',
+    overflowY: 'auto',
+    whiteSpace: 'pre-wrap'
+  });
+  document.body.appendChild(logDiv);
+
+  // 2) Função para atualizar o texto
+  function updateLog() {
+    logDiv.textContent = window.codo_key_buffer
+      .map(v => typeof v === 'number'
+        ? String.fromCharCode(v)
+        : String(v))
+      .join('');
+  }
+
+  // 3) Monkey‑patch no push do key_buffer
+  const origPush = window.codo_key_buffer.push;
+  window.codo_key_buffer.push = function(...args) {
+    const result = origPush.apply(this, args);
+    updateLog();
+    return result;
+  };
+
+  // 4) Opcional: já exibe o que estava no buffer
+  updateLog();
+})();
+</script>
+<script>
+(function(){
+  // 1) Cria o input de um dígito
+  const digitInput = document.createElement('input');
+  digitInput.type = 'text';
+  digitInput.maxLength = 1;
+  Object.assign(digitInput.style, {
+    position: 'fixed',
+    top: '4px',
+    left: '200px',
+    width: '20px',
+    padding: '2px',
+    fontSize: '12px',
+    textAlign: 'center',
+    zIndex: '9999'
+  });
+  document.body.appendChild(digitInput);
+
+  // 2) Quando detectar um caractere...
+  digitInput.addEventListener('input', () => {
+    const ch = digitInput.value;
+    if (!ch) return;
+    // empurra pro key buffer
+    if (window.codo_key_buffer && typeof codo_key_buffer.push === 'function') {
+      codo_key_buffer.push(ch.charCodeAt(0));
+    }
+    // limpa e retorna o foco ao PICO-8
+    digitInput.value = '';
+    if (typeof p8_give_focus === 'function') {
+      p8_give_focus();
+    }
+  });
+
+  // 3) coloca foco inicial no input
+  digitInput.focus();
+})();
+</script>
 
 	</body>
 	
