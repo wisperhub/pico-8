@@ -3501,35 +3501,42 @@ max-width:6vw; max-height:6vw; margin:4px">
 })();
 </script>
 
-//teclado virtual
-
 <script>
-// Cria botão para reabrir o teclado virtual do PICO-8 no celular
+// Script para criar um botão que reabre o teclado do PICO-8 no celular
 (function(){
+    // Cria o botão
     var btn = document.createElement("button");
     btn.innerText = "Teclado";
     btn.style.position = "fixed";
-    btn.style.bottom = "10px";
-    btn.style.right = "10px";
+    btn.style.bottom = "12px";
+    btn.style.right = "12px";
     btn.style.zIndex = "9999";
-    btn.style.background = "#333";
+    btn.style.background = "#222";
     btn.style.color = "#fff";
     btn.style.border = "2px solid #999";
     btn.style.borderRadius = "6px";
-    btn.style.padding = "8px";
-    btn.style.fontSize = "14px";
+    btn.style.padding = "10px 14px";
+    btn.style.fontSize = "15px";
+    btn.style.fontFamily = "sans-serif";
     btn.style.cursor = "pointer";
+    btn.style.opacity = "0.8";
 
+    btn.addEventListener("mouseenter", () => btn.style.opacity = "1");
+    btn.addEventListener("mouseleave", () => btn.style.opacity = "0.8");
+
+    // Ao clicar, tenta abrir o teclado
     btn.addEventListener("click", function() {
-        // Força o teclado a abrir de novo
-        if (typeof p8_keyboard_state !== "undefined") {
-            p8_keyboard_state = 1;
-        }
-        if (typeof Module !== "undefined" && Module.requestKeyboard) {
-            Module.requestKeyboard(true);
-        }
-        else {
-            console.log("Função do teclado não encontrada — apenas o estado foi alterado.");
+        try {
+            if (typeof p8_keyboard_state !== "undefined") {
+                p8_keyboard_state = 1; // ativa modo teclado
+            }
+            if (typeof Module !== "undefined" && Module.requestKeyboard) {
+                Module.requestKeyboard(true); // chama a API do shell se existir
+            } else {
+                console.log("Teclado forçado (sem API Module)");
+            }
+        } catch(e) {
+            console.error("Erro ao tentar abrir teclado:", e);
         }
     });
 
