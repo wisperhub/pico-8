@@ -3500,49 +3500,54 @@ max-width:6vw; max-height:6vw; margin:4px">
   digitInput.focus(); // foco inicial no input
 })();
 </script>
-
 <script>
-// Script para criar um botão que reabre o teclado do PICO-8 no celular
 (function(){
-    // Cria o botão
-    var btn = document.createElement("button");
-    btn.innerText = "Teclado";
-    btn.style.position = "fixed";
-    btn.style.bottom = "12px";
-    btn.style.right = "12px";
-    btn.style.zIndex = "9999";
-    btn.style.background = "#222";
-    btn.style.color = "#fff";
-    btn.style.border = "2px solid #999";
-    btn.style.borderRadius = "6px";
-    btn.style.padding = "10px 14px";
-    btn.style.fontSize = "15px";
-    btn.style.fontFamily = "sans-serif";
-    btn.style.cursor = "pointer";
-    btn.style.opacity = "0.8";
+  // Cria o input
+  const digitInput = document.createElement('input');
+  digitInput.type = 'text';
+  digitInput.maxLength = 1;
+  Object.assign(digitInput.style, {
+    position: 'fixed',
+    top: '4px',
+    left: '200px',
+    width: '24px',
+    padding: '4px',
+    fontSize: '14px',
+    textAlign: 'center',
+    zIndex: '9999'
+  });
+  document.body.appendChild(digitInput);
 
-    btn.addEventListener("mouseenter", () => btn.style.opacity = "1");
-    btn.addEventListener("mouseleave", () => btn.style.opacity = "0.8");
+  digitInput.addEventListener('input', () => {
+    const ch = digitInput.value;
+    if (!ch) return;
 
-    // Ao clicar, tenta abrir o teclado
-    btn.addEventListener("click", function() {
-        try {
-            if (typeof p8_keyboard_state !== "undefined") {
-                p8_keyboard_state = 1; // ativa modo teclado
-            }
-            if (typeof Module !== "undefined" && Module.requestKeyboard) {
-                Module.requestKeyboard(true); // chama a API do shell se existir
-            } else {
-                console.log("Teclado forçado (sem API Module)");
-            }
-        } catch(e) {
-            console.error("Erro ao tentar abrir teclado:", e);
-        }
-    });
+    digitInput.value = ''; // limpa para próxima tecla
 
-    document.body.appendChild(btn);
+    // Pega o dummy usado pelo PICO-8
+    const dummy = document.querySelector('#codo_textarea_0');
+    if (dummy) {
+      // Passa foco pro dummy e injeta o caractere
+      dummy.focus();
+      dummy.value = ch;
+
+      // Se o PICO-8 usa o buffer, envia também
+      if (window.codo_key_buffer && typeof codo_key_buffer.push === 'function') {
+        codo_key_buffer.push(ch.charCodeAt(0));
+      }
+    }
+
+    // Após dar tempo do dummy processar, volta o foco pro input
+    setTimeout(() => {
+      digitInput.focus();
+    }, 50);
+  });
+
+  // Mantém teclado aberto sempre
+  digitInput.focus();
 })();
 </script>
+
 
 	</body>
 	
