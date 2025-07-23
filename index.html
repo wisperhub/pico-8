@@ -3470,34 +3470,35 @@ max-width:6vw; max-height:6vw; margin:4px">
   });
   document.body.appendChild(digitInput);
 
-  // Envia caractere só após foco no canvas
+  // Ao digitar um caractere
   digitInput.addEventListener('input', () => {
     const ch = digitInput.value;
     if (!ch) return;
 
-    digitInput.value = '';
-    digitInput.blur(); // fecha teclado virtual
+    // Bloqueia input temporariamente (teclado ainda visível)
+    digitInput.readOnly = true;
 
-    // espera foco estabilizar no PICO-8
+    // Espera foco voltar ao PICO-8
     setTimeout(() => {
       const canvas = document.querySelector('canvas');
-      if (canvas) {
-        canvas.focus(); // força foco no canvas
-      }
-      if (typeof p8_give_focus === 'function') {
-        p8_give_focus();
-      }
+      if (canvas) canvas.focus();
+      if (typeof p8_give_focus === 'function') p8_give_focus();
 
-      // espera ~50ms pra garantir que o foco aplicou
+      // Depois do foco estabilizar, envia o caractere
       setTimeout(() => {
         if (window.codo_key_buffer && typeof codo_key_buffer.push === 'function') {
           codo_key_buffer.push(ch.charCodeAt(0));
         }
+
+        // Reativa o input para próximo caractere
+        digitInput.readOnly = false;
+        digitInput.value = '';
+        digitInput.focus(); // mantém o foco no campo para novo dígito
       }, 50);
     }, 50);
   });
 
-  digitInput.focus(); // foco inicial no input
+  digitInput.focus(); // foco inicial
 })();
 </script>
 
